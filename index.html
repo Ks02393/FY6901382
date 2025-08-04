@@ -157,7 +157,8 @@
   async function getLastUpdatedTime() {
     const username = 'nr0025';
     const repo = 'FY0025';
-    const url = `https://api.github.com/repos/${username}/${repo}/commits`;
+    const filePath = 'index.html'; // path to your HTML file in the repo
+const url = `https://api.github.com/repos/${username}/${repo}/commits?path=${filePath}`;
 
     try {
       const response = await fetch(url, {
