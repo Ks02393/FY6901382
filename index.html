@@ -46,7 +46,7 @@
         <h2 style="font-family: calibri;"><b>Conference Paper: The Ever Expanding Universe</b></h2>
 
         <!-- Abstract -->
-        <section id="abstract">
+        <section id="Introduction_InText">
             <h3>Abstract</h3>
             <p>
                 The universe is a vast and ever-expanding entity, presenting one of the most intriguing phenomena in modern astrophysics. This paper explores the evidence supporting the universe's expansion, tracing its discovery from Hubble's Law to contemporary findings such as cosmic microwave background radiation and the acceleration of expansion due to dark energy. By examining key observational data, such as Type Ia supernovae and measurements from the Planck mission, this paper highlights the critical milestones in our understanding of cosmology. Despite remarkable progress, the nature of dark energy and the ultimate fate of the universe remain unsolved mysteries.
@@ -65,7 +65,7 @@
             </ul>
         </nav>
 
-        <section id="analysis-discussion">
+        <section id="Analysis_InText">
             <h3>Analysis and Discussion</h3>
             <p>
                 Evidence supporting the expansion of the universe:
@@ -143,84 +143,68 @@
                 <li>Riess, A.G., et al. (2019). Large Magellanic Cloud Cepheid standards provide a 1% foundation for the determination of the Hubble constant. <i>The Astrophysical Journal, 876</i>(1), 85.</li>
             </ul>
         </section>
-      <!-- //////////////////////////////////////////////////////////////////////////////// -->
-  <!-- ////////////////////////////// Adding last update ////////////////////////////// -->
-  <!-- //////////////////////////////////////////////////////////////////////////////// -->
-    <!-- Last commit time display -->
-<div id="last-updated">Loading last update time...</div>
-<!-- Verify Button -->
+
+
+    <!-- ///////////////////////// Last update + Word count ///////////////////////// -->
+<p id="totalWordCount" style="font-weight: bold; text-align: center; font-size: 18px;"></p>
+<p id="last-updated" style="font-weight: bold; text-align: center; font-size: 18px;">Loading last update time...</p>
 <button onclick="verifyLastUpdatedTime()" style="display: block; margin: 10px auto; padding: 8px 16px;">
     Verify Last Modified Time
 </button>
-<script>
-    async function getLastUpdatedTime() {
-        const username = 'nr0025';
-        const repo = 'FY0025';
-       
-        const url = `https://api.github.com/repos/${username}/${repo}/commits`;
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json',
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-            }
-            const commits = await response.json();
-            if (commits && commits.length > 0) {
-                const lastCommitDate = new Date(commits[0].commit.committer.date);
-               
-                // Displaying the time on load
-                document.getElementById('last-updated').innerText = `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
-            } else {
-                document.getElementById('last-updated').innerText = 'No commits found in the repository.';
-            }
-        } catch (error) {
-            console.error('Error fetching the last updated time:', error);
-            document.getElementById('last-updated').innerText = 'Error fetching update time. Please check the repository details.';
-        }
-    }
-    // Function to verify the last update time by re-fetching it from the API
-    async function verifyLastUpdatedTime() {
-        document.getElementById('last-updated').innerText = 'Verifying...';
-        await getLastUpdatedTime();
-        alert("Last modified time has been successfully verified from GitHub API.");
-    }
-    // Initial load to display the time on page load
-    window.onload = getLastUpdatedTime;
-</script>
 
-
- <!-- //////////////////////////////////////////////////////////////////////////////// -->
-  <!-- ////////////////////////////// Word count function ////////////////////////////// -->
-  <!-- //////////////////////////////////////////////////////////////////////////////// -->
-<!-- Placeholder for total word count -->
-<p id="totalWordCount"></p>
-<hr>
 <script>
-  // Function to calculate and display word count for a specified section
-  function displayWordCount(sectionId, outputId) {
-    // Get the text content from the specified section
-    const text = document.getElementById(sectionId).textContent;
-    // Split text into words based on spaces and filter out any empty strings
-    const wordArray = text.trim().split(/\s+/);
-    // Count the words
-    const wordCount = wordArray.length;
-    // Return the word count for summing purposes
-    return wordCount;
+  // Fetch and display last GitHub commit time
+  async function getLastUpdatedTime() {
+    const username = 'nr0025';
+    const repo = 'FY0025';
+    const url = `https://api.github.com/repos/${username}/${repo}/commits`;
+
+    try {
+      const response = await fetch(url, {
+        headers: { 'Accept': 'application/vnd.github.v3+json' }
+      });
+
+      if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+      const commits = await response.json();
+      if (commits.length > 0) {
+        const lastCommitDate = new Date(commits[0].commit.committer.date);
+        document.getElementById('last-updated').innerText = `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
+      } else {
+        document.getElementById('last-updated').innerText = 'No commits found in the repository.';
+      }
+    } catch (error) {
+      console.error('GitHub API error:', error);
+      document.getElementById('last-updated').innerText = 'Error fetching update time.';
+    }
   }
-  // Function to calculate and display total word count from selected sections
+
+  // Manually re-verify update time
+  async function verifyLastUpdatedTime() {
+    document.getElementById('last-updated').innerText = 'Verifying...';
+    await getLastUpdatedTime();
+    alert("Last modified time has been successfully verified from GitHub API.");
+  }
+
+  // Word count function
+  function displayWordCount(sectionId) {
+    const el = document.getElementById(sectionId);
+    if (!el) return 0;
+    const text = el.textContent || '';
+    return text.trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  // Total word count display
   function displayTotalWordCount() {
-    // Calculate word count for each section and accumulate the total
-    const IntroductionCount = displayWordCount("Introduction_InText");
-    const AnalysisCount = displayWordCount("Analysis_InText");
-    // Calculate the sum of all selected sections
-    const totalWordCount = IntroductionCount + AnalysisCount;
-    // Display the total word count
-    document.getElementById("totalWordCount").innerText = `Total word count: ${totalWordCount}`;
+    const intro = displayWordCount("Introduction_InText");
+    const analysis = displayWordCount("Analysis_InText");
+    const total = intro + analysis;
+    document.getElementById("totalWordCount").innerText = `Total word count: ${total}`;
   }
-  // Run the function for specific sections and display total count when the page loads
-  window.onload = displayTotalWordCount;
+
+  // Combined page load function
+  window.onload = async function () {
+    displayTotalWordCount();
+    await getLastUpdatedTime();
+  };
 </script>
