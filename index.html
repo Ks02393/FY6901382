@@ -145,57 +145,68 @@
         </section>
 
 
-    <!-- ///////////////////////// Last update + Word count ///////////////////////// -->
-<p id="totalWordCount" style="font-weight: bold; text-align: center; font-size: 18px;"></p>
-<p id="last-updated" style="font-weight: bold; text-align: center; font-size: 18px;">Loading last update time...</p>
+  <!-- ////////////////////////////////////////////////////////////////////////// -->
+<!-- ////////////////////// Last update + Word count ////////////////////////// -->
+<!-- ////////////////////////////////////////////////////////////////////////// -->
+
+<!-- Last commit time display -->
+<p id="last-updated">Loading last update time...</p>
+
+<!-- Verify Button -->
 <button onclick="verifyLastUpdatedTime()" style="display: block; margin: 10px auto; padding: 8px 16px;">
     Verify Last Modified Time
 </button>
 
+<!-- Total Word Count -->
+<p id="totalWordCount" style="font-weight: bold; text-align: center;"></p>
+<hr>
+
 <script>
-  // Fetch and display last GitHub commit time
+  // Fetch last GitHub commit time
   async function getLastUpdatedTime() {
     const username = 'nr0025';
     const repo = 'FY0025';
-    const filePath = 'index.html'; // path to your HTML file in the repo
-const url = `https://api.github.com/repos/${username}/${repo}/commits?path=${filePath}`;
+    const filePath = 'index.html';
+    const url = `https://api.github.com/repos/${username}/${repo}/commits?path=${filePath}`;
 
     try {
       const response = await fetch(url, {
-        headers: { 'Accept': 'application/vnd.github.v3+json' }
+        method: 'GET',
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+        }
       });
 
-      if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+      if (!response.ok) throw new Error(`Error fetching data: ${response.status}`);
 
       const commits = await response.json();
       if (commits.length > 0) {
         const lastCommitDate = new Date(commits[0].commit.committer.date);
-        document.getElementById('last-updated').innerText = `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
+        document.getElementById('last-updated').innerText =
+          `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
       } else {
-        document.getElementById('last-updated').innerText = 'No commits found in the repository.';
+        document.getElementById('last-updated').innerText = 'No commits found.';
       }
     } catch (error) {
-      console.error('GitHub API error:', error);
+      console.error('Error fetching update time:', error);
       document.getElementById('last-updated').innerText = 'Error fetching update time.';
     }
   }
 
-  // Manually re-verify update time
+  // Manually verify button click
   async function verifyLastUpdatedTime() {
     document.getElementById('last-updated').innerText = 'Verifying...';
     await getLastUpdatedTime();
-    alert("Last modified time has been successfully verified from GitHub API.");
+    alert("Last modified time verified from GitHub.");
   }
 
-  // Word count function
+  // Count words in a section
   function displayWordCount(sectionId) {
-    const el = document.getElementById(sectionId);
-    if (!el) return 0;
-    const text = el.textContent || '';
+    const text = document.getElementById(sectionId)?.textContent || '';
     return text.trim().split(/\s+/).filter(Boolean).length;
   }
 
-  // Total word count display
+  // Total word count
   function displayTotalWordCount() {
     const intro = displayWordCount("Introduction_InText");
     const analysis = displayWordCount("Analysis_InText");
@@ -203,12 +214,9 @@ const url = `https://api.github.com/repos/${username}/${repo}/commits?path=${fil
     document.getElementById("totalWordCount").innerText = `Total word count: ${total}`;
   }
 
-  // Combined page load function
+  //  Unified window.onload
   window.onload = async function () {
     displayTotalWordCount();
     await getLastUpdatedTime();
   };
 </script>
-        <p id="last-updated">Last Modified Time: 04/08/2025, 22:53:00</p>
-        </body>
-</html>
