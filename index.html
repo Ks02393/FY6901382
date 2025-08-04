@@ -145,21 +145,24 @@
         </section>
 
 
-<!-- //////////////////////////////////////////////////////////////////////////////// -->
-  <!-- ////////////////////////////// Adding last update ////////////////////////////// -->
-  <!-- //////////////////////////////////////////////////////////////////////////////// -->
-    <!-- Last commit time display -->
+<!-- ////////////////////////////// Last Modified Time ////////////////////////////// -->
 <div id="last-updated">Loading last update time...</div>
-<!-- Verify Button -->
 <button onclick="verifyLastUpdatedTime()" style="display: block; margin: 10px auto; padding: 8px 16px;">
     Verify Last Modified Time
 </button>
+
+<!-- ////////////////////////////// Word Count Display ////////////////////////////// -->
+<p id="totalWordCount" style="text-align: center; font-weight: bold;"></p>
+<hr>
+
+<!-- ////////////////////////////// Combined Script ////////////////////////////// -->
 <script>
+    // GitHub Last Modified Time
     async function getLastUpdatedTime() {
         const username = 'nr0025';
         const repo = 'FY0025';
-       
         const url = `https://api.github.com/repos/${username}/${repo}/commits`;
+
         try {
             const response = await fetch(url, {
                 method: 'GET',
@@ -173,8 +176,6 @@
             const commits = await response.json();
             if (commits && commits.length > 0) {
                 const lastCommitDate = new Date(commits[0].commit.committer.date);
-               
-                // Displaying the time on load
                 document.getElementById('last-updated').innerText = `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
             } else {
                 document.getElementById('last-updated').innerText = 'No commits found in the repository.';
@@ -184,44 +185,35 @@
             document.getElementById('last-updated').innerText = 'Error fetching update time. Please check the repository details.';
         }
     }
-    // Function to verify the last update time by re-fetching it from the API
+
     async function verifyLastUpdatedTime() {
         document.getElementById('last-updated').innerText = 'Verifying...';
         await getLastUpdatedTime();
         alert("Last modified time has been successfully verified from GitHub API.");
     }
-    // Initial load to display the time on page load
-    <script>
-  window.onload = function () {
-    getLastUpdatedTime();         // shows "Last Modified Time"
-    displayTotalWordCount();      // shows word count
-  };
-</script>
-</script>
 
+    // Word Count
+    function displayWordCount(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (!section) return 0;
+        const text = section.textContent;
+        const wordArray = text.trim().split(/\s+/);
+        return wordArray.length;
+    }
 
- <!-- //////////////////////////////////////////////////////////////////////////////// -->
-  <!-- ////////////////////////////// Word count function ////////////////////////////// -->
-  <!-- //////////////////////////////////////////////////////////////////////////////// -->
-<!-- Placeholder for total word count -->
-<p id="totalWordCount"></p>
-<hr>
-<script>
-  // Function to calculate and display word count for a specified section
-  <script>
-  function displayWordCount(sectionId) {
-    const text = document.getElementById(sectionId).textContent;
-    const wordArray = text.trim().split(/\s+/);
-    return wordArray.length;
-  }
+    function displayTotalWordCount() {
+        const abstractCount = displayWordCount("abstract");
+        const analysisCount = displayWordCount("analysis-discussion");
+        const conclusionCount = displayWordCount("conclusion");
 
-  function displayTotalWordCount() {
-    const IntroductionCount = displayWordCount("abstract");
-    const AnalysisCount = displayWordCount("analysis-discussion");
-    const ConclusionCount = displayWordCount("conclusion");
+        const total = abstractCount + analysisCount + conclusionCount;
 
-    const totalWordCount = IntroductionCount + AnalysisCount + ConclusionCount;
+        document.getElementById("totalWordCount").innerText = `Total word count: ${total}`;
+    }
 
-    document.getElementById("totalWordCount").innerText = `Total word count: ${totalWordCount}`;
-  }
+    // Combined page load event
+    window.onload = function () {
+        getLastUpdatedTime();
+        displayTotalWordCount();
+    };
 </script>
