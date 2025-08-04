@@ -157,11 +157,13 @@
 
 <!-- ////////////////////////////// Combined Script ////////////////////////////// -->
 <script>
-    // GitHub Last Modified Time
+    <script>
     async function getLastUpdatedTime() {
         const username = 'nr0025';
         const repo = 'FY0025';
-        const url = `https://api.github.com/repos/${username}/${repo}/commits`;
+        const filePath = 'index.html'; // ← change this to match your file name and folder if needed
+
+        const url = `https://api.github.com/repos/${username}/${repo}/commits?path=${filePath}`;
 
         try {
             const response = await fetch(url, {
@@ -170,19 +172,22 @@
                     'Accept': 'application/vnd.github.v3+json',
                 }
             });
+
             if (!response.ok) {
                 throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
             }
+
             const commits = await response.json();
             if (commits && commits.length > 0) {
                 const lastCommitDate = new Date(commits[0].commit.committer.date);
-                document.getElementById('last-updated').innerText = `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
+                document.getElementById('last-updated').innerText =
+                    `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
             } else {
-                document.getElementById('last-updated').innerText = 'No commits found in the repository.';
+                document.getElementById('last-updated').innerText = 'No commits found for this file.';
             }
         } catch (error) {
             console.error('Error fetching the last updated time:', error);
-            document.getElementById('last-updated').innerText = 'Error fetching update time. Please check the repository details.';
+            document.getElementById('last-updated').innerText = 'Error fetching update time.';
         }
     }
 
@@ -192,28 +197,8 @@
         alert("Last modified time has been successfully verified from GitHub API.");
     }
 
-    // Word Count
-    function displayWordCount(sectionId) {
-        const section = document.getElementById(sectionId);
-        if (!section) return 0;
-        const text = section.textContent;
-        const wordArray = text.trim().split(/\s+/);
-        return wordArray.length;
-    }
-
-    function displayTotalWordCount() {
-        const abstractCount = displayWordCount("abstract");
-        const analysisCount = displayWordCount("analysis-discussion");
-        const conclusionCount = displayWordCount("conclusion");
-
-        const total = abstractCount + analysisCount + conclusionCount;
-
-        document.getElementById("totalWordCount").innerText = `Total word count: ${total}`;
-    }
-
-    // Combined page load event
     window.onload = function () {
         getLastUpdatedTime();
-        displayTotalWordCount();
+        displayTotalWordCount(); // if you're using word count too
     };
 </script>
