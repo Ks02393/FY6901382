@@ -144,30 +144,82 @@
             </ul>
         </section>
 
-        <!-- Word Count and Last Modified Footer -->
-        <footer class="w3-container w3-light-grey w3-padding-16" style="text-align: center;">
-            <p id="word-count"><b>Word Count:</b> Calculating...</p>
-            <p id="last-modified"><b>Last Modified Time:</b> Calculating...</p>
-        </footer>
+<!-- ///////////////////////////// Embedded Presentation ///////////////////////////// -->
+<section id="presentation">
+  <h3 style="text-align: center;">ENG0018 Presentation</h3>
+  <p style="text-align: center;">Watch the recorded presentation below (with audio):</p>
 
-        <script>
-            // Word Count Calculation
-            function getWordCount() {
-                const text = document.querySelector('main').innerText;
-                const words = text.match(/\b\w+\b/g); // basic word match
-                return words ? words.length : 0;
-            }
+  <video width="100%" height="480" controls>
+    <source src="ENG0018_Presentation.mp4" type="video/mp4">
+    Your browser does not support the video tag. <a href="ENG0018_Presentation.mp4" download>Download instead</a>
+  </video>
+</section>
 
-            // Update Word Count
-            document.getElementById("word-count").innerText = `Word Count: ${getWordCount()}`;
+<hr>
 
-            // Update Last Modified Time
-            const modified = new Date(document.lastModified);
-            const formattedDate = modified.toLocaleDateString('en-GB') + ', ' + modified.toLocaleTimeString('en-GB');
-            document.getElementById("last-modified").innerText = `Last Modified Time: ${formattedDate}`;
-        </script>
+<!-- ///////////////////////////// Word Count + Last Update ///////////////////////////// -->
+<p id="totalWordCount" style="font-weight: bold; text-align: center;"></p>
+<p id="last-updated" style="font-weight: bold; text-align: center;">Loading last update time...</p>
+<button onclick="verifyLastUpdatedTime()" style="display: block; margin: 10px auto; padding: 8px 16px;">
+  Verify Last Modified Time
+</button>
 
-    </main>
+<script>
+  // GitHub Last Modified Time
+  async function getLastUpdatedTime() {
+    const username = 'nr0025'; // CHANGE THIS IF DIFFERENT
+    const repo = 'FY0025';     // CHANGE THIS IF DIFFERENT
+    const filePath = 'index.html'; // The main HTML file you're updating
+    const url = `https://api.github.com/repos/${username}/${repo}/commits?path=${filePath}`;
+
+    try {
+      const response = await fetch(url, {
+        headers: { 'Accept': 'application/vnd.github.v3+json' }
+      });
+
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      const commits = await response.json();
+
+      if (commits.length > 0) {
+        const lastCommitDate = new Date(commits[0].commit.committer.date);
+        document.getElementById('last-updated').innerText = `Last Modified Time: ${lastCommitDate.toLocaleString()}`;
+      } else {
+        document.getElementById('last-updated').innerText = 'No commits found.';
+      }
+    } catch (error) {
+      console.error('GitHub API error:', error);
+      document.getElementById('last-updated').innerText = 'Error fetching update time.';
+    }
+  }
+
+  // Button-triggered re-check
+  async function verifyLastUpdatedTime() {
+    document.getElementById('last-updated').innerText = 'Verifying...';
+    await getLastUpdatedTime();
+    alert("Last modified time verified.");
+  }
+
+  // Word count by section ID
+  function countWordsById(id) {
+    const element = document.getElementById(id);
+    if (!element) return 0;
+    return element.textContent.trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  function displayTotalWordCount() {
+    const introCount = countWordsById("Introduction_InText");
+    const analysisCount = countWordsById("Analysis_InText");
+    const total = introCount + analysisCount;
+    document.getElementById("totalWordCount").innerText = `Total word count: ${total}`;
+  }
+
+  // On page load
+  window.onload = async function () {
+    displayTotalWordCount();
+    await getLastUpdatedTime();
+  };
+</script>
+
 </body>
 
 </html>
