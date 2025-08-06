@@ -143,3 +143,31 @@
                 <li>Riess, A.G., et al. (2019). Large Magellanic Cloud Cepheid standards provide a 1% foundation for the determination of the Hubble constant. <i>The Astrophysical Journal, 876</i>(1), 85.</li>
             </ul>
         </section>
+
+        <!-- Word Count and Last Modified Footer -->
+        <footer class="w3-container w3-light-grey w3-padding-16" style="text-align: center;">
+            <p id="word-count"><b>Word Count:</b> Calculating...</p>
+            <p id="last-modified"><b>Last Modified Time:</b> Calculating...</p>
+        </footer>
+
+        <script>
+            // Word Count Calculation
+            function getWordCount() {
+                const text = document.querySelector('main').innerText;
+                const words = text.match(/\b\w+\b/g); // basic word match
+                return words ? words.length : 0;
+            }
+
+            // Update Word Count
+            document.getElementById("word-count").innerText = `Word Count: ${getWordCount()}`;
+
+            // Update Last Modified Time
+            const modified = new Date(document.lastModified);
+            const formattedDate = modified.toLocaleDateString('en-GB') + ', ' + modified.toLocaleTimeString('en-GB');
+            document.getElementById("last-modified").innerText = `Last Modified Time: ${formattedDate}`;
+        </script>
+
+    </main>
+</body>
+
+</html>
